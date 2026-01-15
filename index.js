@@ -12,11 +12,10 @@ let lampState = { on: true };
 io.on('connection', (socket) => {
   socket.emit('lampStateUpdate', lampState);
 
-  // Recevoir les changements d'état
   socket.on('toggleLamp', (state) => {
     lampState = state;
-    // Diffuser à TOUS les clients
     io.emit('lampStateUpdate', state);
+    console.log('État de la lampe mis à jour:', state);
   });
 });
 
