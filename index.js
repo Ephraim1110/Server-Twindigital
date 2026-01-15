@@ -4,8 +4,21 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 
 const app = express();
+
+// Configuration CORS pour Express
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type']
+}));
+
 const server = http.createServer(app);
-const io = socketIo(server, { cors: { origin: '*' } });
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 
 let lampState = { on: true };
 
@@ -20,5 +33,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3001, () => {
-  console.log('Serveur Socket.io sur http://localhost:3001');
+  console.log('Serveur Socket.io sur http://0.0.0.0:3001');
 });
