@@ -15,7 +15,9 @@ async function getLampState() {
 
 async function setLampState(state) {
   await lampThing.invokeAction("setPowerState", { powerState: state });
-  return { powerState: state };
+  // Lire l'état réel du device après le changement
+  const powerState = await lampThing.readProperty("powerState");
+  return { powerState };
 }
 
 async function toggleLamp() {
