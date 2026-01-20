@@ -8,27 +8,10 @@ const { initWoT } = require("./wotClient");
 const { initLamp, getLampState, toggleLamp, setLampState } = require("./lampService");
 
 const app = express();
-<<<<<<< HEAD
-
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
-}));
-
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
-});
-=======
 app.use(cors({ origin: "*" }));
 
 const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: "*" } });
->>>>>>> 54b1aa6 (feat: ajouter la gestion des lampes avec Web of Things (WoT) et Socket.IO)
 
 // Socket.IO : synchronisation temps réel
 io.on("connection", async (socket) => {
@@ -41,18 +24,6 @@ io.on("connection", async (socket) => {
     socket.emit("error", { message: "Lampe WoT indisponible" });
   }
 
-<<<<<<< HEAD
-  socket.on('toggleLamp', (state) => {
-    lampState = state;
-    io.emit('lampStateUpdate', state);
-    console.log('État de la lampe mis à jour:', state);
-  });
-});
-
-server.listen(3001, () => {
-  console.log('Serveur Socket.io sur http://0.0.0.0:3001');
-});
-=======
   // toggle lampe
   socket.on("toggleLamp", async () => {
     try {
@@ -91,4 +62,3 @@ async function start() {
 }
 
 start();
->>>>>>> 54b1aa6 (feat: ajouter la gestion des lampes avec Web of Things (WoT) et Socket.IO)
