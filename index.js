@@ -27,15 +27,22 @@ io.on("connection", async (socket) => {
 
   // Réception d'un changement d'état depuis le front
   socket.on("setLampState", async (data) => {
+    console.log("📨 setLampState reçu:", data);
     try {
-      if (!data.powerState || !["on", "off"].includes(data.powerState)) return;
+      if (!data.powerState || !["on", "off"].includes(data.powerState)) {
+        console.error("❌ Validation échouée:", data);
+        socket.emit("error", { message: "État invalide" });
+        return;
+      }
 
+      console.log("🔄 Invocation setPowerState avec:", data.powerState);
       const newState = await setLampState(data.powerState);
+      console.log("✅ Nouvel état du device:", newState);
       io.emit("lampStateUpdate", newState); // synchroniser tous les clients
-      console.log("Lampe WoT mise à jour :", newState);
+      console.log("📡 lampStateUpdate envoyé aux clients");
     } catch (err) {
-      console.error(err);
-      socket.emit("error", { message: "Erreur set Lampe WoT" });
+      console.error("❌ Erreur setLampState:", err.message || err);
+      socket.emit("error", { message: "Erreur set Lampe WoT: " + (err.message || err) });
     }
   });
 
