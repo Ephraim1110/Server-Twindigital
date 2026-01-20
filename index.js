@@ -5,7 +5,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 
 const { initWoT } = require("./wotClient");
-const { initLamp, getLampState, toggleLamp, setLampState } = require("./lampService");
+const { initLamp, getLampState, setLampState } = require("./lampService");
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -17,6 +17,7 @@ const io = socketIo(server, { cors: { origin: "*" } });
 io.on("connection", async (socket) => {
   console.log("Nouvelle connexion Socket.IO");
 
+  // Envoyer l'état actuel dès la connexion
   try {
     const state = await getLampState();
     socket.emit("lampStateUpdate", state);
@@ -24,26 +25,22 @@ io.on("connection", async (socket) => {
     socket.emit("error", { message: "Lampe WoT indisponible" });
   }
 
-  // toggle lampe
-  socket.on("toggleLamp", async () => {
+  // Réception d'un changement d'état depuis le front
+  socket.on("setLampState", async (data) => {
     try {
-      const newState = await toggleLamp();
-      io.emit("lampStateUpdate", newState);
-      console.log("Lampe synchronisée WoT :", newState);
+      if (!data.powerState || !["on", "off"].includes(data.powerState)) return;
+
+      const newState = await setLampState(data.powerState);
+      io.emit("lampStateUpdate", newState); // synchroniser tous les clients
+      console.log("Lampe WoT mise à jour :", newState);
     } catch (err) {
-      socket.emit("error", { message: "Erreur toggle Lampe WoT" });
+      console.error(err);
+      socket.emit("error", { message: "Erreur set Lampe WoT" });
     }
   });
 
-  // set explicitement l'état
-  socket.on("setLampState", async (data) => {
-    try {
-      const newState = await setLampState(data.powerState);
-      io.emit("lampStateUpdate", newState);
-      console.log("Lampe WoT mise à jour :", newState);
-    } catch (err) {
-      socket.emit("error", { message: "Erreur set Lampe WoT" });
-    }
+  socket.on("disconnect", () => {
+    console.log("Client déconnecté");
   });
 });
 
