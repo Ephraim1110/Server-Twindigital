@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/Ephraim1110/Server-Twindigital#readme",
   "dependencies": {
+    "@node-wot/binding-http": "^0.9.1",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "socket.io": "^4.8.3"
